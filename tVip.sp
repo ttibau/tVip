@@ -65,6 +65,8 @@ public void OnPluginStart() {
   		`enddate` timestamp NOT NULL DEFAULT '1970-01-01 00:00:01', \
   		`admin_playername` varchar(36) COLLATE utf8_bin NOT NULL, \
   		`admin_playerid` varchar(20) COLLATE utf8_bin NOT NULL, \
+        `admin_steamid` varchar(20) COLLATE utf8_bin NOT NULL, \
+        `player_steamid` varchar(20) COLLATE utf8_bin NOT NULL, \
  		 PRIMARY KEY (`Id`), \
   		 UNIQUE KEY `playerid` (`playerid`)  \
   		 ) ENGINE = InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;"
@@ -371,7 +373,9 @@ public int targetChooserMenuHandler(Handle menu, MenuAction action, int client, 
 
 public void grantVip(int admin, int client, int duration, int reason) {
 	char admin_playerid[20];
+    char admin_steamid[64];
 	GetClientAuthId(admin, AuthId_Steam2, admin_playerid, sizeof(admin_playerid));
+    GetClientAuthId(admin, AuthId_SteamID64, admin_playerid, sizeof(admin_playerid));
 	if (StrContains(admin_playerid, "STEAM_") != -1)
 		strcopy(admin_playerid, sizeof(admin_playerid), admin_playerid[8]);
 	char admin_playername[MAX_NAME_LENGTH + 8];
@@ -384,7 +388,9 @@ public void grantVip(int admin, int client, int duration, int reason) {
 	
 	
 	char playerid[20];
+    char player_steamid[64];
 	GetClientAuthId(client, AuthId_Steam2, playerid, sizeof(playerid));
+    GetClientAuthId(client, AuthId_SteamID64, playerid, sizeof(playerid));
 	if (StrContains(playerid, "STEAM_") != -1)
 		strcopy(playerid, sizeof(playerid), playerid[8]);
 	char playername[MAX_NAME_LENGTH + 8];
@@ -394,7 +400,7 @@ public void grantVip(int admin, int client, int duration, int reason) {
 	
 	
 	char addVipQuery[4096];
-	Format(addVipQuery, sizeof(addVipQuery), "INSERT IGNORE INTO `tVip` (`Id`, `timestamp`, `playername`, `playerid`, `enddate`, `admin_playername`, `admin_playerid`) VALUES (NULL, CURRENT_TIMESTAMP, '%s', '%s', CURRENT_TIMESTAMP, '%s', '%s');", clean_playername, playerid, clean_admin_playername, admin_playerid);
+	Format(addVipQuery, sizeof(addVipQuery), "INSERT IGNORE INTO `tVip` (`Id`, `timestamp`, `playername`, `playerid`, `enddate`, `admin_playername`, `admin_playerid`, `admin_steamid`, `player_steamid`) VALUES (NULL, CURRENT_TIMESTAMP, '%s', '%s', CURRENT_TIMESTAMP, '%s', '%s');", clean_playername, playerid, clean_admin_playername, admin_playerid, admin_steamid, player_steamid);
 	SQL_TQuery(g_DB, SQLErrorCheckCallback, addVipQuery);
 	
 	char updateTime[1024];
@@ -411,8 +417,11 @@ public void grantVip(int admin, int client, int duration, int reason) {
 
 public void grantVipEx(int admin, char playerid[20], int duration, char[] pname, int timeFormat) {
 	char admin_playerid[20];
+    char player_steamid[64];
 	if (admin != 0) {
 		GetClientAuthId(admin, AuthId_Steam2, admin_playerid, sizeof(admin_playerid));
+        GetClientAuthId(admin, AuthId_SteamID64, admin_playerid, sizeof(admin_playerid));
+
 		if (StrContains(admin_playerid, "STEAM_") != -1)
 			strcopy(admin_playerid, sizeof(admin_playerid), admin_playerid[8]);
 	} else
@@ -749,4 +758,4 @@ public int NativeDeleteVip(Handle myplugin, int argc)
 		strcopy(playerid, sizeof(playerid), playerid[8]);
 	
 	deleteVip(playerid);
-} 
+}
