@@ -390,7 +390,7 @@ public void grantVip(int admin, int client, int duration, int reason) {
 	char playerid[20];
     char player_steamid[64];
 	GetClientAuthId(client, AuthId_Steam2, playerid, sizeof(playerid));
-    GetClientAuthId(client, AuthId_SteamID64, playerid, sizeof(playerid));
+    GetClientAuthId(client, AuthId_SteamID64, player_steamid, sizeof(player_steamid));
 	if (StrContains(playerid, "STEAM_") != -1)
 		strcopy(playerid, sizeof(playerid), playerid[8]);
 	char playername[MAX_NAME_LENGTH + 8];
@@ -400,7 +400,7 @@ public void grantVip(int admin, int client, int duration, int reason) {
 	
 	
 	char addVipQuery[4096];
-	Format(addVipQuery, sizeof(addVipQuery), "INSERT IGNORE INTO `tVip` (`Id`, `timestamp`, `playername`, `playerid`, `enddate`, `admin_playername`, `admin_playerid`, `admin_steamid`, `player_steamid`) VALUES (NULL, CURRENT_TIMESTAMP, '%s', '%s', CURRENT_TIMESTAMP, '%s', '%s');", clean_playername, playerid, clean_admin_playername, admin_playerid, admin_steamid, player_steamid);
+	Format(addVipQuery, sizeof(addVipQuery), "INSERT IGNORE INTO `tVip` (`Id`, `timestamp`, `playername`, `playerid`, `enddate`, `admin_playername`, `admin_playerid`, `admin_steamid`, `player_steamid`) VALUES (NULL, CURRENT_TIMESTAMP, '%s', '%s', CURRENT_TIMESTAMP, '%s', '%s', '%s', '%s');", clean_playername, playerid, clean_admin_playername, admin_playerid, admin_steamid, player_steamid);
 	SQL_TQuery(g_DB, SQLErrorCheckCallback, addVipQuery);
 	
 	char updateTime[1024];
@@ -420,7 +420,7 @@ public void grantVipEx(int admin, char playerid[20], int duration, char[] pname,
     char player_steamid[64];
 	if (admin != 0) {
 		GetClientAuthId(admin, AuthId_Steam2, admin_playerid, sizeof(admin_playerid));
-        GetClientAuthId(admin, AuthId_SteamID64, admin_playerid, sizeof(admin_playerid));
+        GetClientAuthId(admin, AuthId_SteamID64, player_steamid, sizeof(player_steamid));
 
 		if (StrContains(admin_playerid, "STEAM_") != -1)
 			strcopy(admin_playerid, sizeof(admin_playerid), admin_playerid[8]);
